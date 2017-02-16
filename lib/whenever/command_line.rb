@@ -14,7 +14,7 @@ module Whenever
       @options[:cut]             ||= 0
       @options[:identifier]      ||= default_identifier
 
-      if !File.exist?(@options[:file]) && @options[:clear].nil?
+      if !File.exist?(@options[:file]) && @options[:clear].nil? && @options[:string].nil?
         warn("[fail] Can't find file: #{@options[:file]}")
         exit(1)
       end
@@ -47,7 +47,7 @@ module Whenever
   protected
 
     def default_identifier
-      File.expand_path(@options[:file])
+      File.exist?(@options[:file]) ? File.expand_path(@options[:file]) : "No Identifier Specified"
     end
 
     def whenever_cron
