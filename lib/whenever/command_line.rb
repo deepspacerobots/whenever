@@ -9,6 +9,9 @@ module Whenever
     def initialize(options={})
       @options = options
 
+      # to add ssh - use options[:ssh_username] and options[:ssh_host]
+      # works best with rsa key authentication
+
       @options[:crontab_command] ||= 'crontab'
       @options[:file]            ||= 'config/schedule.rb'
       @options[:cut]             ||= 0
@@ -62,12 +65,22 @@ module Whenever
       command << '-l'
       command << "-u #{@options[:user]}" if @options[:user]
 
-      command_results  = %x[#{command.join(' ')} 2> /dev/null]
-      @current_crontab = $?.exitstatus.zero? ? prepare(command_results) : ''
+      if use_ssh?
+        Net::SSH.start(@options[:ssh_host],@options[:ssh_username]) do |ssh|
+          ssh.exec!("#{command.join(' ')} 2> /dev/null")  do |ch, stream, data|
+            @command_results = data
+          end
+        end
+      else
+        command_results  = %x[#{command.join(' ')} 2> /dev/null]
+        @current_crontab = $?.exitstatus.zero? ? prepare(command_results) : ''
+      end
     end
 
     def write_crontab(contents)
-      command = [@options[:crontab_command]]
+      command = []
+      command << "ssh #{@options[:ssh_username]}@#{@options[:ssh_host]}" if use_ssh?
+      command << @options[:crontab_command]
       command << "-u #{@options[:user]}" if @options[:user]
       # Solaris/SmartOS cron does not support the - option to read from stdin.
       command << "-" unless OS.solaris?
@@ -120,6 +133,10 @@ module Whenever
       # terminated. (issue #95) Strip all newlines and replace with the default
       # platform record seperator ($/)
       stripped_contents.gsub!(/\s+$/, $/)
+    end
+
+    def use_ssh?
+      @options[:ssh_username] && @options[:ssh_host]
     end
 
     def comment_base
