@@ -68,11 +68,11 @@ module Whenever
         puts "************ HERE #{@options[:ssh_host]}, #{@options[:ssh_username]}"
         Net::SSH.start(@options[:ssh_host],@options[:ssh_username]) do |ssh|
           ssh.exec!("#{command.join(' ')} 2> /dev/null")  do |ch, stream, data|
-            command_results = data
+            @ssh_command_results = data
           end
         end
         puts "********** #{command_results}"
-        @current_crontab = $?.exitstatus.zero? ? prepare(command_results) : ''
+        @current_crontab = $?.exitstatus.zero? ? prepare(@ssh_command_results) : ''
       else
         command_results  = %x[#{command.join(' ')} 2> /dev/null]
         @current_crontab = $?.exitstatus.zero? ? prepare(command_results) : ''
