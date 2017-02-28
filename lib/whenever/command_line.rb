@@ -36,7 +36,6 @@ module Whenever
 
     def run
       if @options[:update] || @options[:clear]
-        puts "*****************"+@options[:update].inspect
         write_crontab(updated_crontab)
       elsif @options[:write]
         write_crontab(whenever_cron)
@@ -66,11 +65,14 @@ module Whenever
       command << "-u #{@options[:user]}" if @options[:user]
 
       if use_ssh?
+        puts "************ HERE #{@options[:ssh_host]}, #{@options[:ssh_username]}"
         Net::SSH.start(@options[:ssh_host],@options[:ssh_username]) do |ssh|
           ssh.exec!("#{command.join(' ')} 2> /dev/null")  do |ch, stream, data|
-            @command_results = data
+            command_results = data
           end
         end
+        puts "********** #{command_results}"
+        @current_crontab = $?.exitstatus.zero? ? prepare(command_results) : ''
       else
         command_results  = %x[#{command.join(' ')} 2> /dev/null]
         @current_crontab = $?.exitstatus.zero? ? prepare(command_results) : ''
@@ -112,13 +114,10 @@ module Whenever
 
       # If an existing identier block is found, replace it with the new cron entries
       if read_crontab =~ Regexp.new("^#{comment_open}\s*$") && read_crontab =~ Regexp.new("^#{comment_close}\s*$")
-        raise "1"+read_crontab.inspect
         # If the existing crontab file contains backslashes they get lost going through gsub.
         # .gsub('\\', '\\\\\\') preserves them. Go figure.
         read_crontab.gsub(Regexp.new("^#{comment_open}\s*$.+^#{comment_close}\s*$", Regexp::MULTILINE), whenever_cron.chomp.gsub('\\', '\\\\\\'))
       else # Otherwise, append the new cron entries after any existing ones
-       raise "2"+read_crontab.inspect
-
         [read_crontab, whenever_cron].join("\n\n")
       end.gsub(/\n{3,}/, "\n\n") # More than two newlines becomes just two.
     end
