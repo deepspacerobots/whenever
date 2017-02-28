@@ -110,10 +110,13 @@ module Whenever
 
       # If an existing identier block is found, replace it with the new cron entries
       if read_crontab =~ Regexp.new("^#{comment_open}\s*$") && read_crontab =~ Regexp.new("^#{comment_close}\s*$")
+        raise "1"+read_crontab.inspect
         # If the existing crontab file contains backslashes they get lost going through gsub.
         # .gsub('\\', '\\\\\\') preserves them. Go figure.
         read_crontab.gsub(Regexp.new("^#{comment_open}\s*$.+^#{comment_close}\s*$", Regexp::MULTILINE), whenever_cron.chomp.gsub('\\', '\\\\\\'))
       else # Otherwise, append the new cron entries after any existing ones
+       raise "2"+read_crontab.inspect
+
         [read_crontab, whenever_cron].join("\n\n")
       end.gsub(/\n{3,}/, "\n\n") # More than two newlines becomes just two.
     end
