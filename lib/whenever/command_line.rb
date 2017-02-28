@@ -70,7 +70,7 @@ module Whenever
             @ssh_command_results = data
           end
         end
-        @current_crontab = $?.exitstatus.zero? ? prepare(@ssh_command_results) : ''
+        @current_crontab = prepare(@ssh_command_results)
       else
         command_results  = %x[#{command.join(' ')} 2> /dev/null]
         @current_crontab = $?.exitstatus.zero? ? prepare(command_results) : ''
