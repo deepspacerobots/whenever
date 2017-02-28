@@ -35,6 +35,7 @@ module Whenever
     end
 
     def run
+      raise "3"+@options.inspect
       if @options[:update] || @options[:clear]
         write_crontab(updated_crontab)
       elsif @options[:write]
