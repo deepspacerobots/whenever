@@ -35,8 +35,8 @@ module Whenever
     end
 
     def run
-      raise "3"+@options.inspect
       if @options[:update] || @options[:clear]
+        puts "*****************"+@options[:update].inspect
         write_crontab(updated_crontab)
       elsif @options[:write]
         write_crontab(whenever_cron)
@@ -78,6 +78,7 @@ module Whenever
     end
 
     def write_crontab(contents)
+      puts "*****************"+content.inspect
       command = []
       command << "ssh #{@options[:ssh_username]}@#{@options[:ssh_host]}" if use_ssh?
       command << @options[:crontab_command]
