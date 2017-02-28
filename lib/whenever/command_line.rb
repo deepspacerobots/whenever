@@ -80,7 +80,7 @@ module Whenever
     end
 
     def write_crontab(contents)
-      puts "*****************"+content.inspect
+      puts "*****************"+contents.inspect
       command = []
       command << "ssh #{@options[:ssh_username]}@#{@options[:ssh_host]}" if use_ssh?
       command << @options[:crontab_command]
