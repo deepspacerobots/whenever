@@ -65,13 +65,11 @@ module Whenever
       command << "-u #{@options[:user]}" if @options[:user]
 
       if use_ssh?
-        puts "************ HERE #{@options[:ssh_host]}, #{@options[:ssh_username]}"
         Net::SSH.start(@options[:ssh_host],@options[:ssh_username]) do |ssh|
           ssh.exec!("#{command.join(' ')} 2> /dev/null")  do |ch, stream, data|
             @ssh_command_results = data
           end
         end
-        puts "********** #{@ssh_command_results}"
         @current_crontab = $?.exitstatus.zero? ? prepare(@ssh_command_results) : ''
       else
         command_results  = %x[#{command.join(' ')} 2> /dev/null]
@@ -80,7 +78,6 @@ module Whenever
     end
 
     def write_crontab(contents)
-      puts "*****************"+contents.inspect
       command = []
       command << "ssh #{@options[:ssh_username]}@#{@options[:ssh_host]}" if use_ssh?
       command << @options[:crontab_command]
