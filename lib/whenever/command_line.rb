@@ -65,9 +65,15 @@ module Whenever
       command << "-u #{@options[:user]}" if @options[:user]
 
       if use_ssh?
+        puts "S TO THE H!"
+        puts "#{command.join(' ')} 2> /dev/null".inspect
+        puts @options[:ssh_host]
+        puts @options[:ssh_username]
         Net::SSH.start(@options[:ssh_host],@options[:ssh_username]) do |ssh|
           ssh.exec!("#{command.join(' ')} 2> /dev/null")  do |ch, stream, data|
             @ssh_command_results = data
+            puts @ssh_command_results.inspect
+
           end
         end
         @current_crontab = prepare(@ssh_command_results)
