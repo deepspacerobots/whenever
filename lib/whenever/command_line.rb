@@ -102,7 +102,6 @@ module Whenever
     end
 
     def updated_crontab
-      raise "WHATTT?"
       # Check for unopened or unclosed identifier blocks
       if read_crontab =~ Regexp.new("^#{comment_open}\s*$") && (read_crontab =~ Regexp.new("^#{comment_close}\s*$")).nil?
         warn "[fail] Unclosed indentifier; Your crontab file contains '#{comment_open}', but no '#{comment_close}'"
