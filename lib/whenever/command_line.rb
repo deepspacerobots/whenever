@@ -124,6 +124,7 @@ module Whenever
       # Strip n lines from the top of the file as specified by the :cut option.
       # Use split with a -1 limit option to ensure the join is able to rebuild
       # the file with all of the original seperators in-tact.
+      raise content.inspect
       stripped_contents = contents.split($/,-1)[@options[:cut]..-1].join($/)
 
       # Some cron implementations require all non-comment lines to be newline-
