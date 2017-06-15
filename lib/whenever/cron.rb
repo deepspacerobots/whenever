@@ -21,6 +21,7 @@ module Whenever
             if detect_cron && item =~ REGEX
               [item]
             else
+              raise item.inspect
               item.split(',')
             end
         else
