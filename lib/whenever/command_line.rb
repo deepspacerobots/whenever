@@ -65,15 +65,9 @@ module Whenever
       command << "-u #{@options[:user]}" if @options[:user]
 
       if use_ssh?
-        puts "S TO THE H!"
-        puts "#{command.join(' ')} 2> /dev/null".inspect
-        puts @options[:ssh_host]
-        puts @options[:ssh_username]
         Net::SSH.start(@options[:ssh_host],@options[:ssh_username]) do |ssh|
           ssh.exec!("#{command.join(' ')} 2> /dev/null")  do |ch, stream, data|
             @ssh_command_results = data
-            puts @ssh_command_results.inspect
-
           end
         end
         @current_crontab = prepare(@ssh_command_results)
@@ -129,7 +123,6 @@ module Whenever
       # Strip n lines from the top of the file as specified by the :cut option.
       # Use split with a -1 limit option to ensure the join is able to rebuild
       # the file with all of the original seperators in-tact.
-      raise contents.inspect
       stripped_contents = contents.split($/,-1)[@options[:cut]..-1].join($/)
 
       # Some cron implementations require all non-comment lines to be newline-
